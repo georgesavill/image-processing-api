@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ImageMagick;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -23,10 +24,15 @@ namespace image_processing_api.Controllers
         [HttpPost]
         public async Task<byte[]> UploadImage()
         {
-            using (MemoryStream image = new MemoryStream(2048))
+            using (MemoryStream memoryStream = new MemoryStream(2048))
             {
-                await Request.Body.CopyToAsync(image);
-                return image.ToArray();
+                await Request.Body.CopyToAsync(memoryStream);
+                byte[] uploadedImage = memoryStream.ToArray();
+                using (MagickImage image = new MagickImage(uploadedImage))
+                {
+                    image.Write("test.jpg");
+                    return image.ToByteArray();
+                }
             }
         }
     }
