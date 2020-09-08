@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -19,9 +21,13 @@ namespace image_processing_api.Controllers
         }
 
         [HttpPost]
-        public string Post()
+        public async Task<byte[]> UploadImage()
         {
-            return "hello world";
+            using (MemoryStream image = new MemoryStream(2048))
+            {
+                await Request.Body.CopyToAsync(image);
+                return image.ToArray();
+            }
         }
     }
 }
