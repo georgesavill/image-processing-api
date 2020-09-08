@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using ImageMagick;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.Net.Http.Headers;
 
 namespace image_processing_api.Controllers
 {
@@ -27,13 +28,22 @@ namespace image_processing_api.Controllers
             using (MemoryStream memoryStream = new MemoryStream(2048))
             {
                 await Request.Body.CopyToAsync(memoryStream);
-                byte[] uploadedImage = memoryStream.ToArray();
-                using (MagickImage image = new MagickImage(uploadedImage))
+
+                return processImage(new ImageJob
                 {
-                    image.Write("test.jpg");
-                    return image.ToByteArray();
-                }
+                    ImageBytes = memoryStream.ToArray(),
+                    Options = new ImageJobOptions{
+                        Format  = Request.Headers["format"],
+                        Size    = Request.Headers["size"],
+                        Quality = Request.Headers["quality"]
+                    }
+                });
             }
+        }
+
+        private byte[] processImage(ImageJob imageJob)
+        {
+            throw new NotImplementedException();
         }
     }
 }
